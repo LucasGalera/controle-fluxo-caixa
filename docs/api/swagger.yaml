@@ -1,0 +1,143 @@
+openapi: 3.0.0
+info:
+  title: Controle de Fluxo de Caixa API
+  description: API para gerenciar lançamentos de débitos e créditos e gerar relatórios diários consolidados.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+    description: Ambiente de Desenvolvimento
+paths:
+  /lancamentos:
+    get:
+      summary: Listar todos os lançamentos
+      responses:
+        '200':
+          description: Lista de lançamentos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lancamento'
+    post:
+      summary: Criar um novo lançamento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LancamentoInput'
+      responses:
+        '201':
+          description: Lançamento criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lancamento'
+  /lancamentos/{id}:
+    get:
+      summary: Obter um lançamento pelo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalhes do lançamento
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lancamento'
+        '404':
+          description: Lançamento não encontrado
+    put:
+      summary: Atualizar um lançamento pelo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LancamentoInput'
+      responses:
+        '200':
+          description: Lançamento atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lancamento'
+        '404':
+          description: Lançamento não encontrado
+    delete:
+      summary: Excluir um lançamento pelo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Lançamento excluído com sucesso
+        '404':
+          description: Lançamento não encontrado
+  /consolidado-diario:
+    get:
+      summary: Obter o relatório diário consolidado
+      responses:
+        '200':
+          description: Relatório diário consolidado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RelatorioDiario'
+components:
+  schemas:
+    Lancamento:
+      type: object
+      properties:
+        id:
+          type: string
+        tipo:
+          type: string
+          enum: [debito, credito]
+        valor:
+          type: number
+          format: double
+        data:
+          type: string
+          format: date-time
+    LancamentoInput:
+      type: object
+      properties:
+        tipo:
+          type: string
+          enum: [debito, credito]
+        valor:
+          type: number
+          format: double
+        data:
+          type: string
+          format: date-time
+    RelatorioDiario:
+      type: object
+      properties:
+        data:
+          type: string
+          format: date
+        saldo:
+          type: number
+          format: double
+        totalDebitos:
+          type: number
+          format: double
+        totalCreditos:
+          type: number
+          format: double
